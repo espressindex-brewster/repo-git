@@ -9,8 +9,6 @@ import TableSection from '@/components/TableSection'
 import type { CityRow } from '@/components/TableSection'
 import ComeFunziona from '@/components/ComeFunziona'
 import Footer from '@/components/Footer'
-import ModalPrivacy from '@/components/ModalPrivacy'
-import ModalContatti from '@/components/ModalContatti'
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -65,8 +63,6 @@ export default async function HomePage() {
         <ComeFunziona />
       </main>
       <Footer />
-      <ModalPrivacy />
-      <ModalContatti />
     </>
   )
 }
