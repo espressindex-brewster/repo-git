@@ -1,0 +1,19 @@
+{
+  "name": "espressindex",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "import:bars": "node --env-file=.env.local --import tsx/esm scripts/import_bars.ts",
+    "call:test": "node --env-file=.env.local --import tsx/esm agent/caller.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4",
+    "typescript": "^5"
+  }
+}

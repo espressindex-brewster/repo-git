@@ -1,0 +1,14 @@
+# Variabili d'ambiente — mai committare
+.env.local
+.env*.local
+
+# Node
+node_modules/
+.next/
+out/
+
+# Claude Code (piani e memoria locali)
+.claude/
+
+# OS
+.DS_Store

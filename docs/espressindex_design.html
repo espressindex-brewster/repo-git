@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espressindex — Il prezzo del caffè in Italia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0e0e0e;
+    --white: #fafaf7;
+    --cream: #f4f1e8;
+    --espresso: #2c1a0e;
+    --caramel: #c8873a;
+    --caramel-light: #f5e6d0;
+    --muted: #7a7670;
+    --border: rgba(0,0,0,0.08);
+    --danger: #b84040;
+    --success: #2e7d52;
+    --warning: #b87a28;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--white);
+    color: var(--black);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* COOKIE BANNER */
+  #cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--espresso);
+    color: #e8d9c8;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  #cookie-banner p {
+    font-size: 13px;
+    line-height: 1.5;
+    flex: 1;
+    min-width: 200px;
+    color: #c8b89a;
+  }
+
+  #cookie-banner a { color: var(--caramel); text-underline-offset: 3px; }
+
+  .cookie-btns { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .btn-accept {
+    background: var(--caramel);
+    color: white;
+    border: none;
+    padding: 7px 18px;
+    border-radius: 4px;
+    font-family: var(--sans);
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-accept:hover { opacity: 0.85; }
+
+  .btn-minimal {
+    background: transparent;
+    color: #c8b89a;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 7px 18px;
+    border-radius: 4px;
+    font-family: var(--sans);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .btn-minimal:hover { border-color: rgba(255,255,255,0.4); }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250,250,247,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 56px;
+  }
+
+  .logo {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--espresso);
+    letter-spacing: -0.3px;
+  }
+
+  .logo span { color: var(--caramel); font-style: italic; }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--black); }
+
+  .btn-caffe {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-family: var(--sans);
+    color: var(--warning);
+    background: var(--caramel-light);
+    border: 1px solid rgba(200,135,58,0.25);
+    border-radius: 20px;
+    padding: 6px 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-caffe:hover { background: #eedbbf; }
+  .btn-caffe svg { width: 14px; height: 14px; }
+
+  /* HERO */
+  .hero {
+    padding: 5rem 2rem 4rem;
+    border-bottom: 1px solid var(--border);
+    max-width: 800px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--success);
+    background: #e8f5ee;
+    border: 1px solid rgba(46,125,82,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.2px;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    color: var(--espresso);
+    margin-bottom: 1.25rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--caramel);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 480px;
+    margin-bottom: 2rem;
+    line-height: 1.65;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    font-family: var(--sans);
+    font-size: 14px;
+    background: var(--espresso);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-secondary {
+    font-family: var(--sans);
+    font-size: 14px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 10px 22px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    text-decoration: none;
+  }
+  .btn-secondary:hover { border-color: rgba(0,0,0,0.2); color: var(--black); }
+
+  /* METRICS */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metric-card {
+    background: var(--white);
+    padding: 1.5rem 2rem;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-family: var(--serif);
+    font-size: 32px;
+    color: var(--espresso);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-sub {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* MAP PLACEHOLDER */
+  .map-section { padding: 2rem; border-bottom: 1px solid var(--border); }
+
+  .map-container {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--muted);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .map-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(200,135,58,0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .map-icon { font-size: 36px; position: relative; }
+  .map-label { font-size: 14px; position: relative; }
+  .map-sub { font-size: 12px; color: #b0a89a; position: relative; }
+
+  /* INSIGHT */
+  .insight {
+    padding: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .insight-box {
+    background: var(--cream);
+    border-left: 3px solid var(--caramel);
+    border-radius: 0 8px 8px 0;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .insight-label {
+    font-size: 10px;
+    color: var(--caramel);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .insight-text {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--espresso);
+    line-height: 1.4;
+  }
+
+  .insight-text strong { font-weight: 400; font-style: italic; }
+
+  /* TABLE */
+  .table-section { padding: 2rem; border-bottom: 1px solid var(--border); }
+
+  .section-title {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 1rem;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    text-align: left;
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th:not(:first-child) { text-align: right; }
+
+  tbody td {
+    padding: 10px 0;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--black);
+  }
+
+  tbody td:not(:first-child) { text-align: right; }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  .city-name { font-weight: 400; }
+  .price { font-family: var(--serif); font-size: 16px; color: var(--espresso); }
+  .delta-up { color: var(--danger); font-size: 12px; }
+  .delta-down { color: var(--success); font-size: 12px; }
+  .delta-neutral { color: var(--muted); font-size: 12px; }
+
+  /* FOOTER */
+  footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1.25rem;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: var(--black); }
+
+  .footer-copy { font-size: 12px; color: var(--muted); }
+
+  .footer-credit {
+    font-size: 11px;
+    color: #b0a89a;
+  }
+
+  .footer-credit a {
+    color: var(--caramel);
+    text-decoration: none;
+  }
+  .footer-credit a:hover { text-decoration: underline; }
+
+  /* COME FUNZIONA */
+  .come-funziona-section {
+    padding: 4rem 2rem;
+    border-bottom: 1px solid var(--border);
+    max-width: 680px;
+  }
+
+  .come-funziona-section h2 {
+    font-family: var(--serif);
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 400;
+    color: var(--espresso);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.3px;
+  }
+
+  .come-funziona-section p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.75;
+    margin-bottom: 1.25rem;
+  }
+
+  .come-funziona-section h3 {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--espresso);
+    margin: 2.5rem 0 0.75rem;
+  }
+
+  .faq-item {
+    border-top: 1px solid var(--border);
+    padding: 1.25rem 0;
+  }
+
+  .faq-item:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq-q {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--black);
+    margin-bottom: 0.5rem;
+  }
+
+  .faq-a {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- COOKIE BANNER -->
+<div id="cookie-banner" role="dialog" aria-label="Cookie policy">
+  <p>Questo sito usa solo cookie tecnici necessari al funzionamento. Nessun cookie di profilazione, nessuna pubblicità. <a href="#">Cookie policy</a></p>
+  <div class="cookie-btns">
+    <button class="btn-accept" onclick="document.getElementById('cookie-banner').style.display='none'">accetta</button>
+    <button class="btn-minimal" onclick="document.getElementById('cookie-banner').style.display='none'">solo necessari</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">espresso<span>index</span></div>
+  <ul class="nav-links">
+    <li><a href="#mappa">mappa</a></li>
+    <li><a href="#dati">dati</a></li>
+    <li><a href="#come-funziona">come funziona</a></li>
+    <li>
+      <a class="btn-caffe" href="https://www.paypal.com/donate" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        offrimi un caffè
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">aggiornato oggi — 12.847 bar mappati</div>
+  <h1>Quanto costa un caffè<br>nel tuo <em>quartiere?</em></h1>
+  <p class="hero-sub">Mappiamo i prezzi di espresso e cappuccino in tutta Italia. Nessuna legge, nessuna multa — solo trasparenza.</p>
+  <div class="hero-cta">
+    <a class="btn-primary" href="#mappa">esplora la mappa →</a>
+    <a class="btn-secondary" href="#come-funziona">come funziona</a>
+  </div>
+</section>
+
+<!-- METRICS -->
+<div class="metrics">
+  <div class="metric-card">
+    <div class="metric-label">media nazionale</div>
+    <div class="metric-value">€1.18</div>
+    <div class="metric-sub">espresso al bancone</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">città più cara</div>
+    <div class="metric-value">Milano</div>
+    <div class="metric-sub">media €1.52</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">città più economica</div>
+    <div class="metric-value">Napoli</div>
+    <div class="metric-sub">media €0.92</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">differenza max-min</div>
+    <div class="metric-value">+65%</div>
+    <div class="metric-sub">tra nord e sud</div>
+  </div>
+</div>
+
+<!-- MAPPA -->
+<section class="map-section" id="mappa">
+  <div class="map-container">
+    <div class="map-icon">☕</div>
+    <div class="map-label">mappa interattiva Mapbox</div>
+    <div class="map-sub">colori per fascia di prezzo · click per dettaglio bar</div>
+  </div>
+</section>
+
+<!-- INSIGHT -->
+<section class="insight">
+  <div class="insight-box">
+    <div class="insight-label">dato della settimana</div>
+    <p class="insight-text">Milano centro storico è <strong>il 40% più cara</strong> della media nazionale. Un espresso in Duomo costa quanto due caffè a Napoli.</p>
+  </div>
+</section>
+
+<!-- TABELLA -->
+<section class="table-section" id="dati">
+  <div class="section-title">prezzi per città</div>
+  <table>
+    <thead>
+      <tr>
+        <th>città</th>
+        <th>espresso</th>
+        <th>vs. media</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="city-name">Milano</td>
+        <td class="price">€1.52</td>
+        <td class="delta-up">+29%</td>
+      </tr>
+      <tr>
+        <td class="city-name">Firenze</td>
+        <td class="price">€1.24</td>
+        <td class="delta-up">+5%</td>
+      </tr>
+      <tr>
+        <td class="city-name">Roma</td>
+        <td class="price">€1.31</td>
+        <td class="delta-up">+11%</td>
+      </tr>
+      <tr>
+        <td class="city-name">Bologna</td>
+        <td class="price">€1.19</td>
+        <td class="delta-neutral">+1%</td>
+      </tr>
+      <tr>
+        <td class="city-name">Palermo</td>
+        <td class="price">€0.95</td>
+        <td class="delta-down">−19%</td>
+      </tr>
+      <tr>
+        <td class="city-name">Napoli</td>
+        <td class="price">€0.92</td>
+        <td class="delta-down">−22%</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- COME FUNZIONA -->
+<section class="come-funziona-section" id="come-funziona">
+  <h2>Come funziona Espressindex</h2>
+  <p>Espressindex mappa i prezzi del caffè nei bar italiani attraverso un sistema di rilevazione automatica. Un agente vocale chiama i locali, chiede il prezzo di espresso e cappuccino al bancone, e registra i dati in tempo reale su una mappa pubblica accessibile a tutti.</p>
+  <p>Nessun form da compilare, nessuna app da scaricare. I prezzi vengono raccolti direttamente alla fonte — dal barista, per telefono, come farebbe qualsiasi cliente curioso.</p>
+
+  <h3>Perché lo facciamo</h3>
+  <p>Il prezzo del caffè in Italia varia enormemente da città a città, da quartiere a quartiere, a volte da un isolato all'altro. Eppure non esiste nessuno strumento che renda questa informazione pubblica e confrontabile. Espressindex colma questo vuoto.</p>
+  <p>La nostra tesi è semplice: la trasparenza dei prezzi genera pressione sociale virtuosa. Quando un bar sa di essere mappato e confrontato con i vicini, ha un incentivo naturale a restare competitivo. Nessuna legge, nessuna multa — solo informazione pubblica.</p>
+
+  <h3>Domande frequenti</h3>
+  <div class="faq-item">
+    <p class="faq-q">I dati sono affidabili?</p>
+    <p class="faq-a">Ogni rilevazione viene validata automaticamente: i prezzi anomali vengono segnalati e verificati prima di apparire sulla mappa. I dati vengono aggiornati periodicamente per riflettere le variazioni nel tempo.</p>
+  </div>
+  <div class="faq-item">
+    <p class="faq-q">È legale?</p>
+    <p class="faq-a">Sì. Chiamare un esercizio commerciale per raccogliere informazioni pubbliche come il prezzo di un prodotto rientra nel legittimo interesse. Il prezzo del caffè non è un dato personale — è un'informazione che chiunque può ottenere semplicemente entrando in un bar.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <span class="footer-copy">espressindex.com — dati pubblici, nessun cookie di profilazione</span>
+    <ul class="footer-links">
+      <li><a href="#" onclick="document.getElementById('modal-privacy').style.display='flex'; return false;">privacy</a></li>
+      <li><a href="#" onclick="document.getElementById('modal-privacy').style.display='flex'; return false;">cookie policy</a></li>
+      <li><a href="#" onclick="document.getElementById('modal-contatti').style.display='flex'; return false;">contatti</a></li>
+    </ul>
+  </div>
+  <p class="footer-credit">
+    Espressindex è un progetto dimostrativo di
+    <a href="https://www.linkedin.com/in/ztomiolo/" target="_blank" rel="noopener">Zeno Tomiolo ↗</a>
+  </p>
+</footer>
+
+<!-- MODAL PRIVACY -->
+<div id="modal-privacy" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:1rem;">
+  <div style="background:var(--white); border-radius:8px; max-width:640px; width:100%; max-height:85vh; overflow-y:auto; padding:2.5rem; position:relative;">
+    <button onclick="document.getElementById('modal-privacy').style.display='none'" style="position:absolute; top:1.25rem; right:1.25rem; background:none; border:none; font-size:20px; cursor:pointer; color:var(--muted);">×</button>
+    <h2 style="font-family:var(--serif); font-size:24px; font-weight:400; color:var(--espresso); margin-bottom:0.25rem;">Privacy Policy</h2>
+    <p style="font-size:11px; color:var(--muted); margin-bottom:2rem;">Ultimo aggiornamento: maggio 2026</p>
+
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">Titolare del trattamento</p>
+    <p style="font-size:14px; margin-bottom:2rem;">Zeno Tomiolo — <a href="mailto:espressindex@gmail.com" style="color:var(--caramel);">espressindex@gmail.com</a></p>
+
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">Quali dati raccogliamo</p>
+    <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:2rem;">Espressindex.com non raccoglie dati personali degli utenti. Non è richiesta registrazione, non vengono raccolti nome, email, indirizzo o qualsiasi altro dato identificativo per navigare il sito. I dati sui prezzi del caffè pubblicati si riferiscono esclusivamente a esercizi commerciali e non a persone fisiche.</p>
+
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">Cookie</p>
+    <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:2rem;">Questo sito utilizza esclusivamente cookie tecnici necessari al funzionamento. Non vengono installati cookie di profilazione, cookie di tracciamento o cookie di terze parti a fini pubblicitari. Non utilizziamo Google Analytics, Meta Pixel, o altri strumenti di tracciamento.</p>
+
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">Dati di navigazione</p>
+    <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:2rem;">I sistemi informatici acquisiscono automaticamente alcuni dati tecnici durante la navigazione: indirizzo IP, tipo di browser, sistema operativo, pagine visitate. Questi dati sono utilizzati esclusivamente per finalità tecniche e di sicurezza, vengono conservati per un massimo di 7 giorni e non sono mai associati a dati identificativi.</p>
+
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">Base giuridica del trattamento dati telefonici</p>
+    <p style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:2rem;">Espressindex raccoglie i prezzi dei prodotti chiamando esercizi commerciali. Tale attività si fonda sul legittimo interesse ai sensi dell'art. 6.1.f GDPR. I prezzi rilevati sono informazioni commerciali pubbliche. Non vengono raccolti o pubblicati dati personali dei gestori o dei dipendenti.</p>
+
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">Diritti degli utenti</p>
+    <p style="font-size:14px; color:var(--muted); line-height:1.7;">Ai sensi del GDPR hai diritto di accesso, rettifica, cancellazione e opposizione al trattamento. Per esercitare questi diritti scrivi a <a href="mailto:espressindex@gmail.com" style="color:var(--caramel);">espressindex@gmail.com</a>.</p>
+  </div>
+</div>
+
+<!-- MODAL CONTATTI -->
+<div id="modal-contatti" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; padding:1rem;">
+  <div style="background:var(--white); border-radius:8px; max-width:480px; width:100%; padding:2.5rem; position:relative;">
+    <button onclick="document.getElementById('modal-contatti').style.display='none'" style="position:absolute; top:1.25rem; right:1.25rem; background:none; border:none; font-size:20px; cursor:pointer; color:var(--muted);">×</button>
+    <h2 style="font-family:var(--serif); font-size:24px; font-weight:400; color:var(--espresso); margin-bottom:2rem;">Contatti</h2>
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">Progetto</p>
+    <p style="font-size:15px; margin-bottom:1.5rem;">Zeno Tomiolo</p>
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">Email</p>
+    <p style="font-size:15px; margin-bottom:1.5rem;"><a href="mailto:espressindex@gmail.com" style="color:var(--caramel); text-decoration:none;">espressindex@gmail.com</a></p>
+    <p style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:0.5rem;">LinkedIn</p>
+    <p style="font-size:15px;"><a href="https://www.linkedin.com/in/ztomiolo/" target="_blank" rel="noopener" style="color:var(--caramel); text-decoration:none;">linkedin.com/in/ztomiolo ↗</a></p>
+  </div>
+</div>
+
+</body>
+</html>

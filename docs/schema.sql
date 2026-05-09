@@ -1,0 +1,84 @@
+-- ============================================================
+-- Schema Supabase di riferimento — Espressindex
+-- Questo file è documentazione; le migrazioni effettive
+-- si trovano in supabase/migrations/ con prefisso numerico.
+-- ============================================================
+
+-- ENUM disponibilita
+--   completa      → prezzo rilevato, bar collaborativo
+--   parziale      → solo uno dei due prezzi disponibile
+--   rifiuto       → bar ha rifiutato di rispondere
+--   non_risponde  → nessuna risposta dopo 2 tentativi
+--   richiamare    → bar ha chiesto di richiamare
+
+-- TABELLA bars
+--   id               UUID PK
+--   nome             TEXT NOT NULL
+--   citta            TEXT NOT NULL
+--   regione          TEXT NOT NULL
+--   lat              NUMERIC(9,6) NOT NULL
+--   lng              NUMERIC(9,6) NOT NULL
+--   telefono         TEXT (nullable)
+--   google_place_id  TEXT UNIQUE (nullable)
+--   created_at       TIMESTAMPTZ DEFAULT NOW()
+
+-- TABELLA calls
+--   id             UUID PK
+--   bar_id         UUID FK → bars.id CASCADE
+--   chiamata_at    TIMESTAMPTZ DEFAULT NOW()
+--   durata_sec     INTEGER CHECK 0–180 (nullable)
+--   disponibilita  disponibilita NOT NULL
+--   note           TEXT (nullable)
+
+-- TABELLA prices
+--   id                  UUID PK
+--   call_id             UUID FK → calls.id CASCADE
+--   bar_id              UUID FK → bars.id CASCADE
+--   espresso_bancone    NUMERIC(4,2) CHECK > 0   (NULL = non rilevato)
+--   cappuccino_bancone  NUMERIC(4,2) CHECK > 0   (NULL = non rilevato)
+--   outlier             BOOLEAN DEFAULT FALSE
+--   created_at          TIMESTAMPTZ DEFAULT NOW()
+--
+--   Regola: mai usare 0 per prezzi non rilevati, usare NULL
+--   Regola: mai float, sempre numeric(4,2)
+
+-- MATERIALIZED VIEW stats_zona
+--   citta                TEXT
+--   regione              TEXT
+--   media_espresso       NUMERIC(4,2)
+--   mediana_espresso     NUMERIC(4,2)
+--   media_cappuccino     NUMERIC(4,2)
+--   mediana_cappuccino   NUMERIC(4,2)
+--   n_bar                BIGINT
+--   aggiornata_at        TIMESTAMPTZ
+--
+--   Refresh: REFRESH MATERIALIZED VIEW CONCURRENTLY stats_zona
+--   Cron:    ogni notte alle 03:00 IT via pg_cron
+
+-- VIEW bar_sopra_media
+--   Tutte le colonne di bars +
+--   ultimo_espresso    NUMERIC(4,2)
+--   ultimo_cappuccino  NUMERIC(4,2)
+--   sopra_media        BOOLEAN
+--
+--   Usata dalla mappa pubblica per colorare i pin
+
+-- RLS
+--   bars   → SELECT pubblico (anon key)
+--   prices → SELECT pubblico (anon key)
+--   calls  → nessun accesso pubblico (solo service role)
+--   Scrittura: solo service role (bypassa RLS)
+
+-- Query utili
+--   Outlier da verificare:
+--     SELECT * FROM prices WHERE outlier = TRUE ORDER BY created_at DESC;
+--
+--   Refresh manuale stats_zona:
+--     REFRESH MATERIALIZED VIEW CONCURRENTLY stats_zona;
+--
+--   Bar che non hanno mai risposto:
+--     SELECT b.* FROM bars b
+--     WHERE NOT EXISTS (
+--       SELECT 1 FROM calls c
+--       WHERE c.bar_id = b.id AND c.disponibilita = 'completa'
+--     );
