@@ -44,7 +44,7 @@ export default async function HomePage() {
   const tableRows: CityRow[] = stats.map((s) => {
     const media = Number(s.media_espresso)
     const delta = mediaGlobale ? Math.round(((media - mediaGlobale) / mediaGlobale) * 100) : 0
-    return { citta: s.citta, mediaEspresso: media, deltaPct: delta }
+    return { citta: s.citta ?? '', mediaEspresso: media, deltaPct: delta }
   })
 
   const insightText =
