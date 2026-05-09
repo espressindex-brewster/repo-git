@@ -3,6 +3,10 @@ export default function Hero({ nBar }: { nBar: number }) {
 
   return (
     <section style={{ padding: '5rem 2rem 4rem', borderBottom: '1px solid var(--border)', maxWidth: '800px' }}>
+      <style>{`
+        .btn-primary:hover { opacity: 0.85; }
+        .btn-secondary:hover { border-color: rgba(0,0,0,0.2) !important; color: var(--black) !important; }
+      `}</style>
       <div style={{
         display: 'inline-flex', alignItems: 'center', gap: '6px',
         fontSize: '11px', color: 'var(--success)',
@@ -35,19 +39,20 @@ export default function Hero({ nBar }: { nBar: number }) {
       </p>
 
       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        <a href="#mappa" style={{
+        <a href="#mappa" className="btn-primary" style={{
           fontFamily: 'var(--font-sans)', fontSize: '14px',
           background: 'var(--espresso)', color: 'white',
           border: 'none', padding: '10px 22px', borderRadius: '4px',
           textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px',
+          transition: 'opacity 0.15s',
         }}>
           esplora la mappa →
         </a>
-        <a href="#come-funziona" style={{
+        <a href="#come-funziona" className="btn-secondary" style={{
           fontFamily: 'var(--font-sans)', fontSize: '14px',
           background: 'transparent', color: 'var(--muted)',
           border: '1px solid var(--border)', padding: '10px 22px', borderRadius: '4px',
-          textDecoration: 'none',
+          textDecoration: 'none', transition: 'border-color 0.15s, color 0.15s',
         }}>
           come funziona
         </a>

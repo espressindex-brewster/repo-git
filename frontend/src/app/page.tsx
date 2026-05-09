@@ -9,6 +9,8 @@ import TableSection from '@/components/TableSection'
 import type { CityRow } from '@/components/TableSection'
 import ComeFunziona from '@/components/ComeFunziona'
 import Footer from '@/components/Footer'
+import ModalPrivacy from '@/components/ModalPrivacy'
+import ModalContatti from '@/components/ModalContatti'
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -31,33 +33,24 @@ export default async function HomePage() {
     : null
 
   const metricsProps = {
-    mediaEspresso: mediaGlobale ? `€${mediaGlobale.toFixed(2)}` : '€1.18',
-    cittaPiuCara: piuCaro?.citta ?? 'Milano',
-    mediaCaraSub: piuCaro ? `media €${Number(piuCaro.media_espresso).toFixed(2)}` : 'media €1.52',
-    cittaPiuEcon: piuEcon?.citta ?? 'Napoli',
-    mediaEconSub: piuEcon ? `media €${Number(piuEcon.media_espresso).toFixed(2)}` : 'media €0.92',
-    differenza: differenzaPct ? `+${differenzaPct}%` : '+65%',
+    mediaEspresso: mediaGlobale ? `€${mediaGlobale.toFixed(2)}` : '—',
+    cittaPiuCara: piuCaro?.citta ?? '—',
+    mediaCaraSub: piuCaro ? `media €${Number(piuCaro.media_espresso).toFixed(2)}` : 'dati in arrivo',
+    cittaPiuEcon: piuEcon?.citta ?? '—',
+    mediaEconSub: piuEcon ? `media €${Number(piuEcon.media_espresso).toFixed(2)}` : 'dati in arrivo',
+    differenza: differenzaPct ? `+${differenzaPct}%` : '—',
   }
 
-  const tableRows: CityRow[] = stats.length > 0
-    ? stats.map((s) => {
-        const media = Number(s.media_espresso)
-        const delta = mediaGlobale ? Math.round(((media - mediaGlobale) / mediaGlobale) * 100) : 0
-        return { citta: s.citta, mediaEspresso: media, deltaPct: delta }
-      })
-    : [
-        { citta: 'Milano', mediaEspresso: 1.52, deltaPct: 29 },
-        { citta: 'Roma', mediaEspresso: 1.31, deltaPct: 11 },
-        { citta: 'Firenze', mediaEspresso: 1.24, deltaPct: 5 },
-        { citta: 'Bologna', mediaEspresso: 1.19, deltaPct: 1 },
-        { citta: 'Palermo', mediaEspresso: 0.95, deltaPct: -19 },
-        { citta: 'Napoli', mediaEspresso: 0.92, deltaPct: -22 },
-      ]
+  const tableRows: CityRow[] = stats.map((s) => {
+    const media = Number(s.media_espresso)
+    const delta = mediaGlobale ? Math.round(((media - mediaGlobale) / mediaGlobale) * 100) : 0
+    return { citta: s.citta, mediaEspresso: media, deltaPct: delta }
+  })
 
   const insightText =
     piuCaro && piuEcon && differenzaPct
       ? `${piuCaro.citta} è <strong>il ${differenzaPct}% più cara</strong> di ${piuEcon.citta}. Un espresso a ${piuCaro.citta} costa €${Number(piuCaro.media_espresso).toFixed(2)}, contro €${Number(piuEcon.media_espresso).toFixed(2)} a ${piuEcon.citta}.`
-      : 'Milano centro storico è <strong>il 40% più cara</strong> della media nazionale. Un espresso in Duomo costa quanto due caffè a Napoli.'
+      : null
 
   return (
     <>
@@ -67,11 +60,13 @@ export default async function HomePage() {
         <Hero nBar={nBar} />
         <Metrics {...metricsProps} />
         <MapSection />
-        <Insight text={insightText} />
-        <TableSection rows={tableRows} />
+        {insightText && <Insight text={insightText} />}
+        {tableRows.length > 0 && <TableSection rows={tableRows} />}
         <ComeFunziona />
       </main>
       <Footer />
+      <ModalPrivacy />
+      <ModalContatti />
     </>
   )
 }

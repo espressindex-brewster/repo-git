@@ -1,5 +1,10 @@
 export default function Navbar() {
   return (
+    <>
+    <style>{`
+      .nav-link:hover { color: var(--black) !important; }
+      .btn-caffe:hover { background: #eedbbf !important; }
+    `}</style>
     <nav style={{
       position: 'sticky', top: 0, zIndex: 100,
       background: 'rgba(250,250,247,0.92)',
@@ -19,21 +24,22 @@ export default function Navbar() {
           { label: 'come funziona', href: '#come-funziona' },
         ].map(({ label, href }) => (
           <li key={href}>
-            <a href={href} style={{ fontSize: '13px', color: 'var(--muted)', textDecoration: 'none' }}>{label}</a>
+            <a href={href} className="nav-link" style={{ fontSize: '13px', color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.15s' }}>{label}</a>
           </li>
         ))}
         <li>
           <a
-            href="https://www.paypal.com/donate"
+            href="https://www.paypal.com/paypalme/Zeno"
             target="_blank"
             rel="noopener"
+            className="btn-caffe"
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               fontSize: '12px', fontFamily: 'var(--font-sans)',
               color: 'var(--warning)', background: 'var(--caramel-light)',
               border: '1px solid rgba(200,135,58,0.25)',
               borderRadius: '20px', padding: '6px 14px',
-              textDecoration: 'none',
+              textDecoration: 'none', transition: 'background 0.15s',
             }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -48,5 +54,6 @@ export default function Navbar() {
         </li>
       </ul>
     </nav>
+    </>
   )
 }

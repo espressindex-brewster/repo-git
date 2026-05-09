@@ -32,6 +32,10 @@ export default function Footer() {
 
   return (
     <>
+      <style>{`
+        .footer-link:hover { color: var(--black) !important; }
+        .footer-credit-link:hover { text-decoration: underline; }
+      `}</style>
       <footer style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border)' }}>
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -51,7 +55,8 @@ export default function Footer() {
                 <a
                   href="#"
                   onClick={(e) => { e.preventDefault(); action() }}
-                  style={{ fontSize: '12px', color: 'var(--muted)', textDecoration: 'none' }}
+                  className="footer-link"
+                  style={{ fontSize: '12px', color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.15s' }}
                 >
                   {label}
                 </a>
@@ -61,7 +66,7 @@ export default function Footer() {
         </div>
         <p style={{ fontSize: '11px', color: '#b0a89a' }}>
           Espressindex è un progetto dimostrativo di{' '}
-          <a href="https://www.linkedin.com/in/ztomiolo/" target="_blank" rel="noopener" style={{ color: 'var(--caramel)', textDecoration: 'none' }}>
+          <a href="https://www.linkedin.com/in/ztomiolo/" target="_blank" rel="noopener" className="footer-credit-link" style={{ color: 'var(--caramel)', textDecoration: 'none' }}>
             Zeno Tomiolo ↗
           </a>
         </p>
