@@ -13,41 +13,47 @@ import Footer from '@/components/Footer'
 export default async function HomePage() {
   const supabase = await createClient()
 
-  const [{ data: barsRaw }, { data: statsZona }] = await Promise.all([
+  const [{ data: barsRaw }, { data: statsZona }, { data: statsCap }] = await Promise.all([
     supabase.from('bars').select('id').not('lat', 'is', null),
     supabase.from('stats_zona').select('citta, media_espresso, n_bar').order('media_espresso', { ascending: false }),
+    supabase.from('stats_cap').select('cap, media_espresso, n_bar').order('media_espresso', { ascending: false }),
   ])
 
   const nBar = barsRaw?.length ?? 0
 
-  // Compute metrics from stats_zona
-  const stats = statsZona ?? []
-  const allMedias = stats.map((s) => Number(s.media_espresso)).filter(Boolean)
-  const mediaGlobale = allMedias.length > 0 ? allMedias.reduce((a, b) => a + b, 0) / allMedias.length : null
-  const piuCaro = stats[0] ?? null
-  const piuEcon = stats[stats.length - 1] ?? null
+  // Metriche dai CAP (boxes in alto)
+  const caps = (statsCap ?? []).filter((s) => s.media_espresso != null)
+  const allMediasCap = caps.map((s) => Number(s.media_espresso))
+  const mediaGlobale = allMediasCap.length > 0 ? allMediasCap.reduce((a, b) => a + b, 0) / allMediasCap.length : null
+  const piuCaro = caps[0] ?? null
+  const piuEcon = caps[caps.length - 1] ?? null
   const differenzaPct = piuCaro && piuEcon && Number(piuEcon.media_espresso) > 0
     ? Math.round(((Number(piuCaro.media_espresso) - Number(piuEcon.media_espresso)) / Number(piuEcon.media_espresso)) * 100)
     : null
 
   const metricsProps = {
     mediaEspresso: mediaGlobale ? `€${mediaGlobale.toFixed(2)}` : '—',
-    cittaPiuCara: piuCaro?.citta ?? '—',
+    cittaPiuCara: piuCaro?.cap ?? '—',
     mediaCaraSub: piuCaro ? `media €${Number(piuCaro.media_espresso).toFixed(2)}` : 'dati in arrivo',
-    cittaPiuEcon: piuEcon?.citta ?? '—',
+    cittaPiuEcon: piuEcon?.cap ?? '—',
     mediaEconSub: piuEcon ? `media €${Number(piuEcon.media_espresso).toFixed(2)}` : 'dati in arrivo',
     differenza: differenzaPct ? `+${differenzaPct}%` : '—',
   }
 
+  // Tabella dalla vista per città
+  const stats = statsZona ?? []
+  const allMediasZona = stats.map((s) => Number(s.media_espresso)).filter(Boolean)
+  const mediaGlobaleZona = allMediasZona.length > 0 ? allMediasZona.reduce((a, b) => a + b, 0) / allMediasZona.length : null
+
   const tableRows: CityRow[] = stats.map((s) => {
     const media = Number(s.media_espresso)
-    const delta = mediaGlobale ? Math.round(((media - mediaGlobale) / mediaGlobale) * 100) : 0
+    const delta = mediaGlobaleZona ? Math.round(((media - mediaGlobaleZona) / mediaGlobaleZona) * 100) : 0
     return { citta: s.citta ?? '', mediaEspresso: media, deltaPct: delta }
   })
 
   const insightText =
-    piuCaro && piuEcon && differenzaPct
-      ? `${piuCaro.citta} è <strong>il ${differenzaPct}% più cara</strong> di ${piuEcon.citta}. Un espresso a ${piuCaro.citta} costa €${Number(piuCaro.media_espresso).toFixed(2)}, contro €${Number(piuEcon.media_espresso).toFixed(2)} a ${piuEcon.citta}.`
+    piuCaro && piuEcon && differenzaPct && piuCaro.cap !== piuEcon.cap
+      ? `Il CAP <strong>${piuCaro.cap}</strong> è <strong>il ${differenzaPct}% più caro</strong> del CAP ${piuEcon.cap}. Un espresso costa €${Number(piuCaro.media_espresso).toFixed(2)} contro €${Number(piuEcon.media_espresso).toFixed(2)}.`
       : null
 
   return (

@@ -37,10 +37,10 @@ export default function Metrics({ mediaEspresso, cittaPiuCara, mediaCaraSub, cit
       borderTop: '1px solid var(--border)',
       borderBottom: '1px solid var(--border)',
     }}>
-      <MetricCard label="media nazionale" value={mediaEspresso} sub="espresso al bancone" />
-      <MetricCard label="città più cara" value={cittaPiuCara} sub={mediaCaraSub} />
-      <MetricCard label="città più economica" value={cittaPiuEcon} sub={mediaEconSub} />
-      <MetricCard label="differenza max-min" value={differenza} sub="tra le città rilevate" />
+      <MetricCard label="media milanese" value={mediaEspresso} sub="espresso al bancone" />
+      <MetricCard label="CAP più caro" value={cittaPiuCara} sub={mediaCaraSub} />
+      <MetricCard label="CAP più economico" value={cittaPiuEcon} sub={mediaEconSub} />
+      <MetricCard label="differenza max-min" value={differenza} sub="tra i CAP rilevati" />
     </div>
   )
 }

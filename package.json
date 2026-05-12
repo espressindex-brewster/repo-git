@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "npm --prefix frontend run dev",
     "import:bars": "node --env-file=.env.local --import tsx/esm scripts/import_bars.ts",
-    "call:test": "node --env-file=.env.local --import tsx/esm agent/caller.ts"
+    "call:test": "node --env-file=.env.local --import tsx/esm agent/caller.ts",
+    "batch:calls": "node --env-file=.env.local --import tsx/esm scripts/batch_calls.ts",
+    "populate:caps": "node --env-file=.env.local --import tsx/esm scripts/populate_caps.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2"

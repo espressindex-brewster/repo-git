@@ -18,6 +18,24 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: 'Espressindex — Il prezzo del caffè in Italia',
   description: 'Quanto costa un caffè al bancone vicino a te? Mappa aggiornata dei prezzi di espresso e cappuccino nei bar italiani.',
+  metadataBase: new URL('https://espressindex.com'),
+  openGraph: {
+    title: 'Espressindex — Il prezzo del caffè in Italia',
+    description: 'Quanto costa un caffè al bancone vicino a te? Mappa aggiornata dei prezzi di espresso e cappuccino nei bar italiani.',
+    url: 'https://espressindex.com',
+    siteName: 'Espressindex',
+    locale: 'it_IT',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Espressindex — Il prezzo del caffè in Italia',
+    description: 'Quanto costa un caffè al bancone vicino a te? Mappa aggiornata dei prezzi di espresso e cappuccino nei bar italiani.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

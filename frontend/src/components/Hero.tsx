@@ -35,7 +35,7 @@ export default function Hero({ nBar }: { nBar: number }) {
       </h1>
 
       <p style={{ fontSize: '16px', color: 'var(--muted)', maxWidth: '480px', marginBottom: '2rem', lineHeight: 1.65 }}>
-        Mappiamo i prezzi di espresso e cappuccino in tutta Italia. Nessuna legge, nessuna multa — solo trasparenza.
+        Mappiamo i prezzi di espresso e cappuccino in tutta Italia, partendo da Milano. Nessuna legge, nessuna multa, solo trasparenza.
       </p>
 
       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

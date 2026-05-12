@@ -43,6 +43,7 @@ npx supabase db push # applica migrazioni al progetto Supabase
 ```
 ANTHROPIC_API_KEY
 RETELL_API_KEY
+RETELL_AGENT_ID
 ELEVENLABS_API_KEY
 TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN

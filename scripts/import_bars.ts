@@ -71,7 +71,7 @@ async function textSearch(
 async function getDetails(placeId: string): Promise<PlaceDetail> {
   const params = new URLSearchParams({
     place_id: placeId,
-    fields: 'formatted_phone_number,address_components',
+    fields: 'formatted_phone_number,address_components,postal_code',
     language: 'it',
     key: GOOGLE_KEY,
   })
@@ -82,17 +82,20 @@ async function getDetails(placeId: string): Promise<PlaceDetail> {
   return data.result ?? {}
 }
 
-function extractCityRegion(components: AddressComponent[] = []): {
+function extractCityRegionCap(components: AddressComponent[] = []): {
   citta: string
   regione: string
+  cap: string | null
 } {
   let citta = ''
   let regione = ''
+  let cap: string | null = null
   for (const c of components) {
     if (c.types.includes('locality')) citta = c.long_name
     if (c.types.includes('administrative_area_level_1')) regione = c.long_name
+    if (c.types.includes('postal_code')) cap = c.long_name
   }
-  return { citta, regione }
+  return { citta, regione, cap }
 }
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -114,7 +117,7 @@ async function importCap(cap: string): Promise<{ imported: number; skipped: numb
       const detail = await getDetails(place.place_id)
       await delay(200)
 
-      const { citta, regione } = extractCityRegion(detail.address_components)
+      const { citta, regione, cap } = extractCityRegionCap(detail.address_components)
 
       if (!citta || !regione) {
         console.warn(`    ⚠ skip ${place.name} — city/region non rilevabili`)
@@ -122,14 +125,19 @@ async function importCap(cap: string): Promise<{ imported: number; skipped: numb
         continue
       }
 
+      const telefono = detail.formatted_phone_number ?? null
+      const telefonoValido = telefono && !/^(800|840|199|892|899)/.test(telefono.replace(/[\s\-().]/g, ''))
+        ? telefono : null
+
       const { error } = await supabase.from('bars').upsert(
         {
           nome: place.name,
           citta,
           regione,
+          cap,
           lat: place.geometry.location.lat,
           lng: place.geometry.location.lng,
-          telefono: detail.formatted_phone_number ?? null,
+          telefono: telefonoValido,
           google_place_id: place.place_id,
         },
         { onConflict: 'google_place_id' },
