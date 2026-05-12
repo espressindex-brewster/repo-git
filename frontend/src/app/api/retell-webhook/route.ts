@@ -1,7 +1,8 @@
 import { createHmac, timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
-import type { Disponibilita } from '@/types/database'
+import type { Database } from '@/types/database'
+type Disponibilita = Database['public']['Enums']['disponibilita']
 
 // ── Tipi Retell ───────────────────────────────────────────
 interface GiuliaOutput {
