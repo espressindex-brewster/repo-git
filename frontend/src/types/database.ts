@@ -151,6 +151,7 @@ export type Database = {
     Views: {
       bar_sopra_media: {
         Row: {
+          cap: string | null
           citta: string | null
           created_at: string | null
           google_place_id: string | null
@@ -161,6 +162,7 @@ export type Database = {
           regione: string | null
           sopra_media: boolean | null
           telefono: string | null
+          ultimo_aggiornamento: string | null
           ultimo_cappuccino: number | null
           ultimo_espresso: number | null
         }

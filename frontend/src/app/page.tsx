@@ -1,3 +1,5 @@
+export const revalidate = 3600
+
 import { createClient } from '@/lib/supabase/server'
 import CookieBanner from '@/components/CookieBanner'
 import Navbar from '@/components/Navbar'
@@ -6,7 +8,7 @@ import Metrics from '@/components/Metrics'
 import MapSection from '@/components/MapSection'
 import Insight from '@/components/Insight'
 import TableSection from '@/components/TableSection'
-import type { CityRow } from '@/components/TableSection'
+import type { CapRow } from '@/components/TableSection'
 import ComeFunziona from '@/components/ComeFunziona'
 import Footer from '@/components/Footer'
 
@@ -16,7 +18,7 @@ export default async function HomePage() {
   const [{ data: barsRaw }, { data: statsZona }, { data: statsCap }] = await Promise.all([
     supabase.from('bars').select('id').not('lat', 'is', null),
     supabase.from('stats_zona').select('citta, media_espresso, n_bar').order('media_espresso', { ascending: false }),
-    supabase.from('stats_cap').select('cap, media_espresso, n_bar').order('media_espresso', { ascending: false }),
+    supabase.from('stats_cap').select('cap, citta, media_espresso, n_bar').order('media_espresso', { ascending: false }),
   ])
 
   const nBar = barsRaw?.length ?? 0
@@ -40,16 +42,15 @@ export default async function HomePage() {
     differenza: differenzaPct ? `+${differenzaPct}%` : '—',
   }
 
-  // Tabella dalla vista per città
-  const stats = statsZona ?? []
-  const allMediasZona = stats.map((s) => Number(s.media_espresso)).filter(Boolean)
-  const mediaGlobaleZona = allMediasZona.length > 0 ? allMediasZona.reduce((a, b) => a + b, 0) / allMediasZona.length : null
-
-  const tableRows: CityRow[] = stats.map((s) => {
-    const media = Number(s.media_espresso)
-    const delta = mediaGlobaleZona ? Math.round(((media - mediaGlobaleZona) / mediaGlobaleZona) * 100) : 0
-    return { citta: s.citta ?? '', mediaEspresso: media, deltaPct: delta }
-  })
+  // Tabella per CAP (top 20 ordinati per prezzo decrescente)
+  const tableRows: CapRow[] = caps
+    .filter((s) => s.media_espresso != null)
+    .slice(0, 20)
+    .map((s) => {
+      const media = Number(s.media_espresso)
+      const delta = mediaGlobale ? Math.round(((media - mediaGlobale) / mediaGlobale) * 100) : 0
+      return { cap: s.cap ?? '', citta: s.citta ?? '', mediaEspresso: media, deltaPct: delta }
+    })
 
   const insightText =
     piuCaro && piuEcon && differenzaPct && piuCaro.cap !== piuEcon.cap

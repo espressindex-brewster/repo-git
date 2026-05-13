@@ -8,6 +8,7 @@ export interface BarPin {
   id: string
   nome: string
   citta: string
+  cap: string | null
   lat: number
   lng: number
   espresso: number | null
@@ -44,11 +45,11 @@ function formatData(iso: string | null): string {
 
 function popupHtml(props: Record<string, unknown>): string {
   const nome = String(props.nome ?? '')
-  const citta = String(props.citta ?? '')
+  const cap = String(props.cap ?? props.citta ?? '')
   const lat = Number(props.lat)
   const lng = Number(props.lng)
   const esp = props.espresso != null ? `€${Number(props.espresso).toFixed(2)}` : '—'
-  const cap = props.cappuccino != null ? `€${Number(props.cappuccino).toFixed(2)}` : '—'
+  const capp = props.cappuccino != null ? `€${Number(props.cappuccino).toFixed(2)}` : '—'
   const fascia = fasciaLabel(props.espresso != null ? Number(props.espresso) : null)
   const colore = prezzoColore(props.espresso != null ? Number(props.espresso) : null)
   const data = formatData(props.ultimoAggiornamento != null ? String(props.ultimoAggiornamento) : null)
@@ -57,14 +58,14 @@ function popupHtml(props: Record<string, unknown>): string {
   return `
     <div style="font-family:system-ui;padding:4px 2px;min-width:180px">
       <div style="font-weight:600;font-size:13px">${nome}</div>
-      <div style="color:#6b7280;font-size:11px;margin-bottom:6px">${citta}</div>
+      <div style="color:#6b7280;font-size:11px;margin-bottom:6px">CAP ${cap}</div>
       <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px">
         <span style="width:8px;height:8px;border-radius:50%;background:${colore};display:inline-block;flex-shrink:0"></span>
         <span style="font-size:11px;color:#374151">${fascia}</span>
       </div>
       <div style="font-size:12px;display:flex;flex-direction:column;gap:3px">
         <span>☕ Espresso: <b>${esp}</b></span>
-        <span>🥛 Cappuccino: <b>${cap}</b></span>
+        <span>🥛 Cappuccino: <b>${capp}</b></span>
       </div>
       ${data ? `<div style="font-size:10px;color:#9ca3af;margin-top:6px">Rilevato il ${data}</div>` : ''}
       <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer"
@@ -106,6 +107,7 @@ export default function PrezziMap({ bars }: { bars: BarPin[] }) {
             id: bar.id,
             nome: bar.nome,
             citta: bar.citta,
+            cap: bar.cap,
             lat: bar.lat,
             lng: bar.lng,
             espresso: bar.espresso,
@@ -279,7 +281,7 @@ export default function PrezziMap({ bars }: { bars: BarPin[] }) {
                   </span>
                 </div>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[10px] text-gray-400">{bar.citta}</span>
+                  <span className="text-[10px] text-gray-400">{bar.cap ? `CAP ${bar.cap}` : bar.citta}</span>
                   <span className="text-[10px] text-gray-300">·</span>
                   <span className="text-[10px] text-gray-400">{fasciaLabel(bar.espresso)}</span>
                 </div>

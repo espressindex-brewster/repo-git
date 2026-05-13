@@ -7,19 +7,21 @@ export default async function MapSection() {
 
   const { data } = await supabase
     .from('bar_sopra_media')
-    .select('id, nome, citta, lat, lng, ultimo_espresso, ultimo_cappuccino')
+    .select('id, nome, citta, cap, lat, lng, ultimo_espresso, ultimo_cappuccino, ultimo_aggiornamento')
     .not('lat', 'is', null)
     .not('lng', 'is', null)
+    .not('ultimo_espresso', 'is', null)
 
   const bars: BarPin[] = (data ?? []).map((b) => ({
     id: b.id!,
     nome: b.nome!,
     citta: b.citta!,
+    cap: b.cap ?? null,
     lat: b.lat!,
     lng: b.lng!,
     espresso: b.ultimo_espresso ?? null,
     cappuccino: b.ultimo_cappuccino ?? null,
-    ultimoAggiornamento: null,
+    ultimoAggiornamento: b.ultimo_aggiornamento ?? null,
   }))
 
   return (

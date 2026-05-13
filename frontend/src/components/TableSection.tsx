@@ -1,23 +1,24 @@
-export interface CityRow {
+export interface CapRow {
+  cap: string
   citta: string
   mediaEspresso: number
   deltaPct: number
 }
 
-export default function TableSection({ rows }: { rows: CityRow[] }) {
+export default function TableSection({ rows }: { rows: CapRow[] }) {
   return (
     <section id="dati" style={{ padding: '2rem', borderBottom: '1px solid var(--border)' }}>
       <div style={{
         fontSize: '12px', color: 'var(--muted)',
         textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '1rem',
       }}>
-        prezzi per città
+        prezzi per CAP
       </div>
 
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            {['città', 'espresso', 'vs. media'].map((h, i) => (
+            {['CAP', 'espresso', 'vs. media'].map((h, i) => (
               <th key={h} style={{
                 fontSize: '11px', color: 'var(--muted)', fontWeight: 400,
                 textAlign: i === 0 ? 'left' : 'right',
@@ -34,9 +35,12 @@ export default function TableSection({ rows }: { rows: CityRow[] }) {
             const deltaColor = row.deltaPct > 2 ? 'var(--danger)' : row.deltaPct < -2 ? 'var(--success)' : 'var(--muted)'
             const deltaLabel = row.deltaPct > 0 ? `+${row.deltaPct}%` : `${row.deltaPct}%`
             return (
-              <tr key={row.citta}>
-                <td style={{ padding: '10px 0', fontSize: '14px', borderBottom: isLast ? 'none' : '1px solid var(--border)', color: 'var(--black)' }}>
-                  {row.citta}
+              <tr key={row.cap}>
+                <td style={{ padding: '10px 0', borderBottom: isLast ? 'none' : '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '14px', color: 'var(--black)' }}>{row.cap}</span>
+                  {row.citta && (
+                    <span style={{ fontSize: '11px', color: 'var(--muted)', marginLeft: '6px' }}>{row.citta}</span>
+                  )}
                 </td>
                 <td style={{ padding: '10px 0', textAlign: 'right', borderBottom: isLast ? 'none' : '1px solid var(--border)', fontFamily: 'var(--font-serif)', fontSize: '16px', color: 'var(--espresso)' }}>
                   €{row.mediaEspresso.toFixed(2)}
