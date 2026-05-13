@@ -61,9 +61,9 @@ async function chiamaBar(bar: { id: string; nome: string; telefono: string; citt
   return 'avviata'
 }
 
-async function selezionaBarPerCitta(citta: string, max: number): Promise<{ id: string; nome: string; telefono: string; citta: string }[]> {
+async function selezionaBarPerCitta(citta: string, max: number, cap?: string): Promise<{ id: string; nome: string; telefono: string; citta: string }[]> {
   // Prende bar con telefono che hanno ricevuto meno di MAX_TENTATIVI chiamate
-  const { data: tutti } = await supabase
+  let query = supabase
     .from('bars')
     .select('id, nome, telefono, citta')
     .ilike('citta', citta)
@@ -73,6 +73,10 @@ async function selezionaBarPerCitta(citta: string, max: number): Promise<{ id: s
     .not('telefono', 'ilike', '199%')
     .not('telefono', 'ilike', '892%')
     .not('telefono', 'ilike', '899%')
+
+  if (cap) query = query.eq('cap', cap)
+
+  const { data: tutti } = await query
     .limit(max * 4) // margine: molti avranno già raggiunto MAX_TENTATIVI
 
   if (!tutti || tutti.length === 0) return []
@@ -104,21 +108,24 @@ async function main() {
 
   const barIds = process.argv.find(a => a.startsWith('--ids='))?.split('=')[1]?.split(',') ?? []
   const cittaArg = process.argv.find(a => a.startsWith('--citta='))?.split('=').slice(1).join('=')
+  const capArg = process.argv.find(a => a.startsWith('--cap='))?.split('=')[1]
   const maxArg = parseInt(process.argv.find(a => a.startsWith('--max='))?.split('=')[1] ?? '50', 10)
 
-  if (barIds.length === 0 && !cittaArg) {
+  if (barIds.length === 0 && !cittaArg && !capArg) {
     console.error('Uso:')
     console.error('  npm run batch:calls -- --ids=uuid1,uuid2,...')
     console.error('  npm run batch:calls -- --citta=Milano [--max=50]')
+    console.error('  npm run batch:calls -- --cap=20121 [--max=50]')
     process.exit(1)
   }
 
   let bars: { id: string; nome: string; telefono: string; citta: string }[]
 
-  if (cittaArg) {
-    bars = await selezionaBarPerCitta(cittaArg, maxArg)
+  if (cittaArg || capArg) {
+    bars = await selezionaBarPerCitta(cittaArg ?? 'Milano', maxArg, capArg)
     if (bars.length === 0) {
-      console.error(`Nessun bar da chiamare a "${cittaArg}" (tutti hanno già ${MAX_TENTATIVI} tentativi o non hanno telefono).`)
+      const label = capArg ? `CAP ${capArg}` : `"${cittaArg}"`
+      console.error(`Nessun bar da chiamare per ${label} (tutti hanno già ${MAX_TENTATIVI} tentativi o non hanno telefono).`)
       process.exit(0)
     }
   } else {
@@ -130,7 +137,7 @@ async function main() {
     bars = (data ?? []) as { id: string; nome: string; telefono: string; citta: string }[]
   }
 
-  const label = cittaArg ? `${cittaArg} (auto-select, max ${maxArg})` : `${bars.length} bar da --ids`
+  const label = capArg ? `CAP ${capArg} (auto-select, max ${maxArg})` : cittaArg ? `${cittaArg} (auto-select, max ${maxArg})` : `${bars.length} bar da --ids`
   console.log(`\nBatch chiamate — ${bars.length} bar — ${label}\n${'─'.repeat(50)}`)
 
   let avviate = 0, saltate = 0, errori = 0

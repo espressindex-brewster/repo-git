@@ -9,10 +9,13 @@ const supabase = createClient(
 
 // ── Args ─────────────────────────────────────────────────
 // Accetta --cap=20121 (singolo) o --cap=20121-20162 (range)
+// Opzionale: --query="pasticceria {cap} Milano" (default: "bar caffè {cap} Italia")
 const capArg = process.argv.find((a) => a.startsWith('--cap='))?.split('=')[1]
+const queryTpl = process.argv.find((a) => a.startsWith('--query='))?.split('=').slice(1).join('=')
 if (!capArg) {
   console.error('Uso: npm run import:bars -- --cap=20121')
   console.error('     npm run import:bars -- --cap=20121-20162')
+  console.error('     npm run import:bars -- --cap=20121-20162 --query="pasticceria {cap} Milano"')
   process.exit(1)
 }
 
@@ -110,7 +113,8 @@ async function importCap(cap: string): Promise<{ imported: number; skipped: numb
 
   do {
     page++
-    const data = await textSearch(`bar caffè ${cap} Italia`, pageToken)
+    const query = (queryTpl ?? 'bar caffè {cap} Italia').replace('{cap}', cap)
+    const data = await textSearch(query, pageToken)
     pageToken = data.next_page_token
 
     for (const place of data.results ?? []) {
