@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import SubmitPriceModal from '@/components/SubmitPriceModal'
 
 export interface BarPin {
   id: string
@@ -68,10 +69,16 @@ function popupHtml(props: Record<string, unknown>): string {
         <span>🥛 Cappuccino: <b>${capp}</b></span>
       </div>
       ${data ? `<div style="font-size:10px;color:#9ca3af;margin-top:6px">Rilevato il ${data}</div>` : ''}
-      <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer"
-         style="display:inline-block;margin-top:7px;font-size:10px;color:#3b82f6;text-decoration:none">
-        Apri in Google Maps →
-      </a>
+      <div style="display:flex;gap:10px;margin-top:8px;align-items:center">
+        <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer"
+           style="font-size:10px;color:#3b82f6;text-decoration:none">
+          Google Maps →
+        </a>
+        <button onclick="window.__espressindexSubmit('${props.id}','${nome.replace(/'/g, "\\'")}')"
+                style="font-size:10px;color:#8b7355;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">
+          Prezzo aggiornato? Segnalalo
+        </button>
+      </div>
     </div>`
 }
 
@@ -79,6 +86,12 @@ export default function PrezziMap({ bars }: { bars: BarPin[] }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [submitBar, setSubmitBar] = useState<{ id: string; nome: string } | null>(null)
+
+  useEffect(() => {
+    ;(window as any).__espressindexSubmit = (id: string, nome: string) => setSubmitBar({ id, nome })
+    return () => { delete (window as any).__espressindexSubmit }
+  }, [])
 
   const conPrezzo = bars.filter((b) => b.espresso !== null).sort((a, b) => a.espresso! - b.espresso!)
 
@@ -296,6 +309,16 @@ export default function PrezziMap({ bars }: { bars: BarPin[] }) {
 
       {/* ── Mappa ──────────────────────────────── */}
       <div ref={containerRef} className="flex-1 h-full" />
+
+      {submitBar && (
+        <SubmitPriceModal
+          isOpen={true}
+          onClose={() => setSubmitBar(null)}
+          barId={submitBar.id}
+          barNome={submitBar.nome}
+          fonte="cliente"
+        />
+      )}
     </div>
   )
 }

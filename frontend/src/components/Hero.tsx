@@ -1,3 +1,5 @@
+import SubmitPriceButton from '@/components/SubmitPriceButton'
+
 export default function Hero({ nBar }: { nBar: number }) {
   const nBarLabel = nBar > 0 ? `${nBar.toLocaleString('it-IT')} bar mappati` : '12.847 bar mappati'
 
@@ -57,6 +59,7 @@ export default function Hero({ nBar }: { nBar: number }) {
           come funziona
         </a>
       </div>
+      <SubmitPriceButton />
     </section>
   )
 }

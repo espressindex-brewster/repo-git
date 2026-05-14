@@ -147,6 +147,57 @@ export type Database = {
           },
         ]
       }
+      submissions: {
+        Row: {
+          bar_id: string | null
+          bar_nome: string
+          cappuccino: number | null
+          created_at: string
+          espresso: number | null
+          fonte: string
+          id: string
+          ip: string | null
+          stato: string
+        }
+        Insert: {
+          bar_id?: string | null
+          bar_nome: string
+          cappuccino?: number | null
+          created_at?: string
+          espresso?: number | null
+          fonte?: string
+          id?: string
+          ip?: string | null
+          stato?: string
+        }
+        Update: {
+          bar_id?: string | null
+          bar_nome?: string
+          cappuccino?: number | null
+          created_at?: string
+          espresso?: number | null
+          fonte?: string
+          id?: string
+          ip?: string | null
+          stato?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submissions_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "bar_sopra_media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submissions_bar_id_fkey"
+            columns: ["bar_id"]
+            isOneToOne: false
+            referencedRelation: "bars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       bar_sopra_media: {
