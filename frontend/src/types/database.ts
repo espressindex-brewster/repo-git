@@ -98,7 +98,7 @@ export type Database = {
       prices: {
         Row: {
           bar_id: string
-          call_id: string
+          call_id: string | null
           cappuccino_bancone: number | null
           created_at: string
           espresso_bancone: number | null
@@ -107,7 +107,7 @@ export type Database = {
         }
         Insert: {
           bar_id: string
-          call_id: string
+          call_id?: string | null
           cappuccino_bancone?: number | null
           created_at?: string
           espresso_bancone?: number | null
@@ -116,7 +116,7 @@ export type Database = {
         }
         Update: {
           bar_id?: string
-          call_id?: string
+          call_id?: string | null
           cappuccino_bancone?: number | null
           created_at?: string
           espresso_bancone?: number | null

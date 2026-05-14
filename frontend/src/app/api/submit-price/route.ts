@@ -7,6 +7,45 @@ function parsePrezzo(v: unknown): number | null {
   return isNaN(n) ? null : n
 }
 
+async function sendNotifica(barNome: string, esp: number | null, capp: number | null, fonte: string) {
+  const key = process.env.RESEND_API_KEY
+  if (!key) return
+
+  const prezzi = [
+    esp  != null ? `Espresso: €${esp.toFixed(2)}` : null,
+    capp != null ? `Cappuccino: €${capp.toFixed(2)}` : null,
+  ].filter(Boolean).join(' · ')
+
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from:    'Espressindex <noreply@espressindex.com>',
+      to:      ['espressindex@gmail.com'],
+      subject: `Nuova segnalazione — ${barNome}`,
+      html: `
+        <p><strong>Bar:</strong> ${barNome}</p>
+        <p><strong>Prezzi:</strong> ${prezzi}</p>
+        <p><strong>Fonte:</strong> ${fonte}</p>
+        <p><a href="https://supabase.com/dashboard/project/wbgwjwbqmnwgiiijajvf/editor" style="color:#6b4226">
+          Approva in Supabase →
+        </a></p>
+      `,
+    }),
+  }).catch((err) => console.error('resend error:', err))
+}
+
+const ESP_MIN = 0.80
+const ESP_MAX = 2.00
+const CAPP_MIN = 0.80
+const CAPP_MAX = 4.00
+
+function inRange(esp: number | null, capp: number | null): boolean {
+  if (esp != null && (esp < ESP_MIN || esp > ESP_MAX)) return false
+  if (capp != null && (capp < CAPP_MIN || capp > CAPP_MAX)) return false
+  return true
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'payload non valido' }, { status: 400 })
@@ -31,21 +70,45 @@ export async function POST(req: NextRequest) {
   }
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? req.headers.get('x-real-ip') ?? null
+  const fonteVal = fonte === 'gestore' ? 'gestore' : 'cliente'
+  const autoApprove = inRange(esp, capp)
 
   const supabase = await createServiceClient()
 
-  const { error } = await supabase.from('submissions').insert({
-    bar_id:    bar_id ?? null,
-    bar_nome:  bar_nome.trim(),
-    espresso:  esp,
-    cappuccino: capp,
-    fonte:     fonte === 'gestore' ? 'gestore' : 'cliente',
-    ip,
-  })
+  const { data: sub, error: subError } = await supabase
+    .from('submissions')
+    .insert({
+      bar_id:     bar_id ?? null,
+      bar_nome:   bar_nome.trim(),
+      espresso:   esp,
+      cappuccino: capp,
+      fonte:      fonteVal,
+      stato:      autoApprove ? 'approvato' : 'pending',
+      ip,
+    })
+    .select('id')
+    .single()
 
-  if (error) {
-    console.error('submit-price insert:', error.message)
+  if (subError) {
+    console.error('submit-price insert:', subError.message)
     return NextResponse.json({ error: 'errore interno' }, { status: 500 })
+  }
+
+  if (autoApprove && bar_id) {
+    const { error: priceError } = await supabase.from('prices').insert({
+      bar_id,
+      call_id:             null,
+      espresso_bancone:    esp,
+      cappuccino_bancone:  capp,
+      outlier:             false,
+    })
+    if (priceError) {
+      console.error('submit-price prices insert:', priceError.message)
+    }
+  }
+
+  if (!autoApprove) {
+    await sendNotifica(bar_nome.trim(), esp, capp, fonteVal)
   }
 
   return NextResponse.json({ ok: true })
