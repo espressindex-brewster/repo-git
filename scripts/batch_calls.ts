@@ -61,7 +61,14 @@ async function chiamaBar(bar: { id: string; nome: string; telefono: string; citt
   return 'avviata'
 }
 
-async function selezionaBarPerCitta(citta: string, max: number, cap?: string): Promise<{ id: string; nome: string; telefono: string; citta: string }[]> {
+// Numeri fissi italiani: iniziano con 0 (es. 02, 06, 011)
+// Cellulari italiani: iniziano con 3 (es. 328, 347) o +39 3xx
+function isMobile(tel: string): boolean {
+  const n = tel.replace(/[\s\-().]/g, '').replace(/^\+39/, '').replace(/^0039/, '')
+  return n.startsWith('3')
+}
+
+async function selezionaBarPerCitta(citta: string, max: number, cap?: string, soloFissi = false): Promise<{ id: string; nome: string; telefono: string; citta: string }[]> {
   // Prende bar con telefono che hanno ricevuto meno di MAX_TENTATIVI chiamate
   let query = supabase
     .from('bars')
@@ -75,6 +82,8 @@ async function selezionaBarPerCitta(citta: string, max: number, cap?: string): P
     .not('telefono', 'ilike', '899%')
 
   if (cap) query = query.eq('cap', cap)
+  // Fissi: esclude numeri che iniziano con 3 o +39 3
+  if (soloFissi) query = query.not('telefono', 'ilike', '3%').not('telefono', 'ilike', '+39 3%')
 
   const { data: tutti } = await query
     .limit(max * 4) // margine: molti avranno già raggiunto MAX_TENTATIVI
@@ -100,6 +109,7 @@ async function selezionaBarPerCitta(citta: string, max: number, cap?: string): P
 
 async function main() {
   const force = process.argv.includes('--force')
+  const soloFissi = process.argv.includes('--solo-fissi')
   if (!force && !orarioConsentito()) {
     const ora = new Date().toLocaleTimeString('it-IT', { timeZone: 'Europe/Rome' })
     console.error(`Fuori orario (${ora} IT). Chiama tra 08:00–11:30 o 15:00–17:30. Usa --force per ignorare.`)
@@ -115,14 +125,14 @@ async function main() {
     console.error('Uso:')
     console.error('  npm run batch:calls -- --ids=uuid1,uuid2,...')
     console.error('  npm run batch:calls -- --citta=Milano [--max=50]')
-    console.error('  npm run batch:calls -- --cap=20121 [--max=50]')
+    console.error('  npm run batch:calls -- --cap=20121 [--max=50] [--solo-fissi]')
     process.exit(1)
   }
 
   let bars: { id: string; nome: string; telefono: string; citta: string }[]
 
   if (cittaArg || capArg) {
-    bars = await selezionaBarPerCitta(cittaArg ?? 'Milano', maxArg, capArg)
+    bars = await selezionaBarPerCitta(cittaArg ?? 'Milano', maxArg, capArg, soloFissi)
     if (bars.length === 0) {
       const label = capArg ? `CAP ${capArg}` : `"${cittaArg}"`
       console.error(`Nessun bar da chiamare per ${label} (tutti hanno già ${MAX_TENTATIVI} tentativi o non hanno telefono).`)
@@ -137,7 +147,8 @@ async function main() {
     bars = (data ?? []) as { id: string; nome: string; telefono: string; citta: string }[]
   }
 
-  const label = capArg ? `CAP ${capArg} (auto-select, max ${maxArg})` : cittaArg ? `${cittaArg} (auto-select, max ${maxArg})` : `${bars.length} bar da --ids`
+  const fissiLabel = soloFissi ? ', solo fissi' : ''
+  const label = capArg ? `CAP ${capArg} (auto-select, max ${maxArg}${fissiLabel})` : cittaArg ? `${cittaArg} (auto-select, max ${maxArg}${fissiLabel})` : `${bars.length} bar da --ids`
   console.log(`\nBatch chiamate — ${bars.length} bar — ${label}\n${'─'.repeat(50)}`)
 
   let avviate = 0, saltate = 0, errori = 0
