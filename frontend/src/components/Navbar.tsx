@@ -14,7 +14,7 @@ export default function Navbar() {
       padding: '0 2rem', height: '56px',
     }}>
       <div style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: 'var(--espresso)', letterSpacing: '-0.3px' }}>
-        espresso<span style={{ color: 'var(--caramel)', fontStyle: 'italic' }}>index</span>
+        ☕ espress<span style={{ color: 'var(--caramel)', fontStyle: 'italic' }}>index</span>
       </div>
 
       <ul style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', listStyle: 'none' }}>
