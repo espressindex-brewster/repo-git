@@ -16,7 +16,7 @@ export default async function HomePage() {
   const supabase = await createClient()
 
   const [{ data: barsRaw }, { data: statsZona }, { data: statsCap }] = await Promise.all([
-    supabase.from('bars').select('id').not('lat', 'is', null),
+    supabase.from('bar_sopra_media').select('id'),
     supabase.from('stats_zona').select('citta, media_espresso, n_bar').order('media_espresso', { ascending: false }),
     supabase.from('stats_cap').select('cap, citta, media_espresso, n_bar').order('media_espresso', { ascending: false }),
   ])

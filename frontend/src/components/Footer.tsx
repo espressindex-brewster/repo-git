@@ -47,8 +47,7 @@ export default function Footer() {
           </span>
           <ul style={{ display: 'flex', gap: '1.25rem', listStyle: 'none' }}>
             {[
-              { label: 'privacy', action: () => setModal('privacy') },
-              { label: 'cookie policy', action: () => setModal('privacy') },
+              { label: 'privacy & cookie policy', action: () => setModal('privacy') },
               { label: 'contatti', action: () => setModal('contatti') },
             ].map(({ label, action }) => (
               <li key={label}>

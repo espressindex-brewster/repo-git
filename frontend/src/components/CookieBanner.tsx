@@ -41,8 +41,7 @@ export default function CookieBanner() {
         }}
       >
         <p style={{ fontSize: '13px', lineHeight: 1.5, flex: 1, minWidth: '200px', color: '#c8b89a' }}>
-          Questo sito usa solo cookie tecnici necessari al funzionamento. Nessun cookie di profilazione, nessuna pubblicità.{' '}
-          <a href="#" style={{ color: 'var(--caramel)', textUnderlineOffset: '3px' }}>Cookie policy</a>
+          Questo sito usa solo cookie tecnici necessari al funzionamento. Nessun cookie di profilazione, nessuna pubblicità.
         </p>
         <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
           <button onClick={dismiss} className="cookie-btn-accept" style={{

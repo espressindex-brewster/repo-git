@@ -10,14 +10,14 @@ export default function SubmitPriceButton() {
       <button
         onClick={() => setOpen(true)}
         style={{
-          fontFamily: 'var(--font-sans)', fontSize: '12px',
-          background: 'transparent', color: 'var(--muted)',
-          border: '1px solid var(--border)', padding: '6px 16px',
+          fontFamily: 'var(--font-sans)', fontSize: '14px',
+          background: 'var(--espresso)', color: 'white',
+          border: 'none', padding: '10px 22px',
           borderRadius: '4px', cursor: 'pointer', marginTop: '0.75rem',
-          transition: 'border-color 0.15s, color 0.15s',
+          transition: 'opacity 0.15s', display: 'inline-flex', alignItems: 'center',
         }}
-        onMouseEnter={(e) => { (e.target as HTMLElement).style.color = 'var(--black)'; (e.target as HTMLElement).style.borderColor = 'rgba(0,0,0,0.2)' }}
-        onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'var(--muted)'; (e.target as HTMLElement).style.borderColor = 'var(--border)' }}
+        onMouseEnter={(e) => { (e.target as HTMLElement).style.opacity = '0.85' }}
+        onMouseLeave={(e) => { (e.target as HTMLElement).style.opacity = '1' }}
       >
         Sei un gestore? Aggiungi il prezzo del tuo bar →
       </button>
