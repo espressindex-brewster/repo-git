@@ -15,6 +15,7 @@ export interface BarPin {
   espresso: number | null
   cappuccino: number | null
   ultimoAggiornamento: string | null
+  googlePlaceId: string | null
 }
 
 // ── Colore per fascia prezzo espresso ─────────────────────
@@ -47,14 +48,14 @@ function formatData(iso: string | null): string {
 function popupHtml(props: Record<string, unknown>): string {
   const nome = String(props.nome ?? '')
   const cap = String(props.cap ?? props.citta ?? '')
-  const lat = Number(props.lat)
-  const lng = Number(props.lng)
   const esp = props.espresso != null ? `€${Number(props.espresso).toFixed(2)}` : '—'
   const capp = props.cappuccino != null ? `€${Number(props.cappuccino).toFixed(2)}` : '—'
   const fascia = fasciaLabel(props.espresso != null ? Number(props.espresso) : null)
   const colore = prezzoColore(props.espresso != null ? Number(props.espresso) : null)
   const data = formatData(props.ultimoAggiornamento != null ? String(props.ultimoAggiornamento) : null)
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+  const mapsUrl = props.googlePlaceId
+    ? `https://www.google.com/maps/place/?q=place_id:${props.googlePlaceId}`
+    : `https://www.google.com/maps/search/?api=1&query=${props.lat},${props.lng}`
 
   return `
     <div style="font-family:system-ui;padding:4px 2px;min-width:180px">
@@ -126,6 +127,7 @@ export default function PrezziMap({ bars }: { bars: BarPin[] }) {
             espresso: bar.espresso,
             cappuccino: bar.cappuccino,
             ultimoAggiornamento: bar.ultimoAggiornamento,
+            googlePlaceId: bar.googlePlaceId,
             colore: prezzoColore(bar.espresso),
           },
         })),

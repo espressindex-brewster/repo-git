@@ -7,7 +7,7 @@ export default async function MapSection() {
 
   const { data } = await supabase
     .from('bar_sopra_media')
-    .select('id, nome, citta, cap, lat, lng, ultimo_espresso, ultimo_cappuccino, ultimo_aggiornamento')
+    .select('id, nome, citta, cap, lat, lng, ultimo_espresso, ultimo_cappuccino, ultimo_aggiornamento, google_place_id')
     .not('lat', 'is', null)
     .not('lng', 'is', null)
     .not('ultimo_espresso', 'is', null)
@@ -22,6 +22,7 @@ export default async function MapSection() {
     espresso: b.ultimo_espresso ?? null,
     cappuccino: b.ultimo_cappuccino ?? null,
     ultimoAggiornamento: b.ultimo_aggiornamento ?? null,
+    googlePlaceId: b.google_place_id ?? null,
   }))
 
   return (
