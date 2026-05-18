@@ -33,7 +33,7 @@ export default function Hero({ nBar }: { nBar: number }) {
         color: 'var(--espresso)',
         marginBottom: '1.25rem',
       }}>
-        Quanto costa un caffè<br />nel tuo <em style={{ fontStyle: 'italic', color: 'var(--caramel)' }}>quartiere?</em>
+        Quanto costa un espresso<br />nel tuo <em style={{ fontStyle: 'italic', color: 'var(--caramel)' }}>quartiere?</em>
       </h1>
 
       <p style={{ fontSize: '16px', color: 'var(--muted)', maxWidth: '480px', marginBottom: '2rem', lineHeight: 1.65 }}>

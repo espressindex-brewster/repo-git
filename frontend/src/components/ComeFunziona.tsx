@@ -4,8 +4,12 @@ const FAQ = [
     a: 'Ogni rilevazione viene validata automaticamente: i prezzi anomali vengono segnalati e verificati prima di apparire sulla mappa. I dati vengono aggiornati periodicamente per riflettere le variazioni nel tempo.',
   },
   {
-    q: 'È legale?',
+    q: 'È legale raccogliere i prezzi chiamando i bar?',
     a: 'Sì. Chiamare un esercizio commerciale per raccogliere informazioni pubbliche come il prezzo di un prodotto rientra nel legittimo interesse. Il prezzo del caffè non è un dato personale: è un\'informazione pubblica che chiunque può ottenere semplicemente entrando in un bar.',
+  },
+  {
+    q: 'Come vengono raccolti i prezzi?',
+    a: 'Un agente vocale chiama direttamente i bar, chiede il prezzo di espresso e cappuccino al bancone e registra i dati in tempo reale. Nessun form da compilare, nessuna app da scaricare: i prezzi vengono raccolti alla fonte, dal barista, per telefono.',
   },
 ]
 

@@ -18,7 +18,7 @@ const dmSans = DM_Sans({
 const DESCRIPTION = 'Scopri quanto costa un espresso o un cappuccino al bancone nei bar italiani. Mappa aggiornata dei prezzi del caffè in Italia: confronta per quartiere, CAP e città.'
 
 export const metadata: Metadata = {
-  title: '☕ Espressindex — Il prezzo del caffè in Italia',
+  title: 'Espressindex — Prezzi espresso e caffè in Italia per quartiere',
   icons: { icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>☕</text></svg>" },
   description: DESCRIPTION,
   metadataBase: new URL('https://espressindex.com'),
