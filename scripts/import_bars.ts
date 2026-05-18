@@ -55,14 +55,22 @@ interface PlaceDetail {
   address_components?: AddressComponent[]
 }
 
+// ── Tipi di ricerca per CAP ───────────────────────────────
+const SEARCH_TYPES: { query: string; type: string }[] = [
+  { query: 'bar caffè {cap} Italia',     type: 'cafe'    },
+  { query: 'pasticceria {cap} Milano',   type: 'bakery'  },
+  { query: 'cake shop {cap} Milano',     type: 'bakery'  },
+]
+
 // ── API helpers ───────────────────────────────────────────
 async function textSearch(
   query: string,
+  type: string,
   pageToken?: string,
 ): Promise<{ results: PlaceResult[]; next_page_token?: string }> {
   const params = new URLSearchParams({
     query,
-    type: 'cafe',
+    type,
     language: 'it',
     key: GOOGLE_KEY,
   })
@@ -111,59 +119,66 @@ const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 // ── Import singolo CAP ────────────────────────────────────
 async function importCap(cap: string): Promise<{ imported: number; skipped: number; errors: number }> {
-  let pageToken: string | undefined
-  let page = 0
   let imported = 0
   let skipped = 0
   let errors = 0
 
-  do {
-    page++
-    const query = (queryTpl ?? 'bar caffè {cap} Italia').replace('{cap}', cap)
-    const data = await textSearch(query, pageToken)
-    pageToken = data.next_page_token
+  const searchConfigs = queryTpl
+    ? [{ query: queryTpl, type: 'cafe' }]
+    : SEARCH_TYPES
 
-    for (const place of data.results ?? []) {
-      const detail = await getDetails(place.place_id)
-      await delay(200)
+  for (const { query: queryTemplate, type } of searchConfigs) {
+    let pageToken: string | undefined
+    let page = 0
 
-      const { citta, regione, cap } = extractCityRegionCap(detail.address_components)
+    do {
+      page++
+      const query = queryTemplate.replace('{cap}', cap)
+      const data = await textSearch(query, type, pageToken)
+      pageToken = data.next_page_token
 
-      if (!citta || !regione) {
-        console.warn(`    ⚠ skip ${place.name} — city/region non rilevabili`)
-        skipped++
-        continue
+      for (const place of data.results ?? []) {
+        const detail = await getDetails(place.place_id)
+        await delay(200)
+
+        const { citta, regione, cap: detailCap } = extractCityRegionCap(detail.address_components)
+
+        if (!citta || !regione) {
+          console.warn(`    ⚠ skip ${place.name} — city/region non rilevabili`)
+          skipped++
+          continue
+        }
+
+        const telefono = detail.formatted_phone_number ?? null
+        const telefonoValido = telefono && !/^(800|840|199|892|899)/.test(telefono.replace(/[\s\-().]/g, ''))
+          ? telefono : null
+
+        const { error } = await supabase.from('bars').upsert(
+          {
+            nome: place.name,
+            citta,
+            regione,
+            cap: detailCap,
+            lat: place.geometry.location.lat,
+            lng: place.geometry.location.lng,
+            telefono: telefonoValido,
+            google_place_id: place.place_id,
+          },
+          { onConflict: 'google_place_id' },
+        )
+
+        if (error) {
+          console.error(`    ✗ ${place.name}: ${error.message}`)
+          errors++
+        } else {
+          console.log(`    ✓ ${place.name} — ${citta}`)
+          imported++
+        }
       }
 
-      const telefono = detail.formatted_phone_number ?? null
-      const telefonoValido = telefono && !/^(800|840|199|892|899)/.test(telefono.replace(/[\s\-().]/g, ''))
-        ? telefono : null
-
-      const { error } = await supabase.from('bars').upsert(
-        {
-          nome: place.name,
-          citta,
-          regione,
-          cap,
-          lat: place.geometry.location.lat,
-          lng: place.geometry.location.lng,
-          telefono: telefonoValido,
-          google_place_id: place.place_id,
-        },
-        { onConflict: 'google_place_id' },
-      )
-
-      if (error) {
-        console.error(`    ✗ ${place.name}: ${error.message}`)
-        errors++
-      } else {
-        console.log(`    ✓ ${place.name} — ${citta}`)
-        imported++
-      }
-    }
-
-    if (pageToken) await delay(2000)
-  } while (pageToken && page < 3) // max 60 risultati per CAP
+      if (pageToken) await delay(2000)
+    } while (pageToken && page < 3) // max 60 risultati per query
+  }
 
   return { imported, skipped, errors }
 }
