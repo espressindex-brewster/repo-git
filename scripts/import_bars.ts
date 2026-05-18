@@ -20,6 +20,9 @@ if (!capArg) {
 }
 
 function parseCaps(arg: string): string[] {
+  if (arg.includes(',')) {
+    return arg.split(',').map(s => s.trim()).filter(Boolean)
+  }
   if (arg.includes('-') && arg.split('-').length === 2) {
     const [from, to] = arg.split('-').map(Number)
     if (isNaN(from) || isNaN(to) || from > to) {
@@ -74,14 +77,17 @@ async function textSearch(
 async function getDetails(placeId: string): Promise<PlaceDetail> {
   const params = new URLSearchParams({
     place_id: placeId,
-    fields: 'formatted_phone_number,address_components,postal_code',
+    fields: 'formatted_phone_number,address_components',
     language: 'it',
     key: GOOGLE_KEY,
   })
   const res = await fetch(
     `https://maps.googleapis.com/maps/api/place/details/json?${params}`,
   )
-  const data = (await res.json()) as { result: PlaceDetail }
+  const data = (await res.json()) as { result: PlaceDetail; status?: string; error_message?: string }
+  if (data.status && data.status !== 'OK') {
+    console.error(`    ✗ getDetails ${placeId}: ${data.status} — ${data.error_message ?? ''}`)
+  }
   return data.result ?? {}
 }
 
