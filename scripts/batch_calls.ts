@@ -90,15 +90,17 @@ async function selezionaDistribuito(max: number, soloFissi = false, prioritaCap:
   if (!tutti || tutti.length === 0) return []
 
   const ids = tutti.map((b) => b.id)
-  const { data: chiamate } = await supabase
-    .from('calls')
-    .select('bar_id')
-    .in('bar_id', ids)
-    .limit(50000)
-
   const contatoreChiamate: Record<string, number> = {}
-  for (const c of chiamate ?? []) {
-    contatoreChiamate[c.bar_id] = (contatoreChiamate[c.bar_id] ?? 0) + 1
+  const CHUNK = 200
+  for (let i = 0; i < ids.length; i += CHUNK) {
+    const { data: chiamate } = await supabase
+      .from('calls')
+      .select('bar_id')
+      .in('bar_id', ids.slice(i, i + CHUNK))
+      .limit(50000)
+    for (const c of chiamate ?? []) {
+      contatoreChiamate[c.bar_id] = (contatoreChiamate[c.bar_id] ?? 0) + 1
+    }
   }
 
   // Somma chiamate per CAP (su tutti i bar, non solo disponibili)
@@ -183,15 +185,17 @@ async function selezionaBarPerCitta(citta: string, max: number, cap?: string, so
 
   // Conta chiamate già fatte per ciascun bar
   const ids = tutti.map((b) => b.id)
-  const { data: chiamate } = await supabase
-    .from('calls')
-    .select('bar_id')
-    .in('bar_id', ids)
-    .limit(50000)
-
   const contatoreChiamate: Record<string, number> = {}
-  for (const c of chiamate ?? []) {
-    contatoreChiamate[c.bar_id] = (contatoreChiamate[c.bar_id] ?? 0) + 1
+  const CHUNK = 200
+  for (let i = 0; i < ids.length; i += CHUNK) {
+    const { data: chiamate } = await supabase
+      .from('calls')
+      .select('bar_id')
+      .in('bar_id', ids.slice(i, i + CHUNK))
+      .limit(50000)
+    for (const c of chiamate ?? []) {
+      contatoreChiamate[c.bar_id] = (contatoreChiamate[c.bar_id] ?? 0) + 1
+    }
   }
 
   return tutti
