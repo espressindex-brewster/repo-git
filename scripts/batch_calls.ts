@@ -86,8 +86,15 @@ async function selezionaDistribuito(max: number, soloFissi = false, prioritaCap:
   if (soloFissi) query = query.not('telefono', 'ilike', '3%').not('telefono', 'ilike', '+39 3%')
 
   type BarRow = { id: string; nome: string; telefono: string; citta: string; cap: string }
-  const { data: tutti } = await (query as any).limit(10000) as { data: BarRow[] | null }
-  if (!tutti || tutti.length === 0) return []
+  const tutti: BarRow[] = []
+  const PAGE = 1000
+  for (let offset = 0; ; offset += PAGE) {
+    const { data: page } = await (query as any).range(offset, offset + PAGE - 1) as { data: BarRow[] | null }
+    if (!page || page.length === 0) break
+    tutti.push(...page)
+    if (page.length < PAGE) break
+  }
+  if (tutti.length === 0) return []
 
   const ids = tutti.map((b) => b.id)
   const contatoreChiamate: Record<string, number> = {}
