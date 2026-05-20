@@ -5,7 +5,7 @@ export default function Footer() {
         .footer-link:hover { color: var(--black) !important; }
         .footer-credit-link:hover { text-decoration: underline; }
       `}</style>
-      <footer style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border)' }}>
+      <footer style={{ padding: 'clamp(1rem, 3vw, 1.5rem) clamp(1rem, 4vw, 2rem)', borderTop: '1px solid var(--border)' }}>
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           flexWrap: 'wrap', gap: '8px', marginBottom: '12px',

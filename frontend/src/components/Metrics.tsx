@@ -6,11 +6,11 @@ interface MetricCardProps {
 
 function MetricCard({ label, value, sub }: MetricCardProps) {
   return (
-    <div style={{ background: 'var(--white)', padding: '1.5rem 2rem' }}>
+    <div style={{ background: 'var(--white)', padding: 'clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)' }}>
       <div style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '6px' }}>
         {label}
       </div>
-      <div style={{ fontFamily: 'var(--font-serif)', fontSize: '32px', color: 'var(--espresso)', lineHeight: 1, marginBottom: '4px' }}>
+      <div style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(24px, 4vw, 32px)', color: 'var(--espresso)', lineHeight: 1, marginBottom: '4px' }}>
         {value}
       </div>
       <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{sub}</div>

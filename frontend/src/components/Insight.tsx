@@ -1,6 +1,6 @@
 export default function Insight({ text }: { text: string }) {
   return (
-    <section style={{ padding: '2rem', borderBottom: '1px solid var(--border)' }}>
+    <section style={{ padding: 'clamp(1rem, 3vw, 2rem)', borderBottom: '1px solid var(--border)' }}>
       <div style={{
         background: 'var(--cream)',
         borderLeft: '3px solid var(--caramel)',
