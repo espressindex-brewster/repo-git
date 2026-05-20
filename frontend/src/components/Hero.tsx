@@ -4,7 +4,7 @@ export default function Hero({ nBar }: { nBar: number }) {
   const nBarLabel = nBar > 0 ? `${nBar.toLocaleString('it-IT')} bar mappati` : '12.847 bar mappati'
 
   return (
-    <section style={{ padding: '5rem 2rem 4rem', borderBottom: '1px solid var(--border)', maxWidth: '800px' }}>
+    <section style={{ padding: 'clamp(2rem, 8vw, 5rem) clamp(1rem, 4vw, 2rem) clamp(2rem, 6vw, 4rem)', borderBottom: '1px solid var(--border)', maxWidth: '800px' }}>
       <style>{`
         .btn-primary:hover { opacity: 0.85; }
         .btn-secondary:hover { border-color: rgba(0,0,0,0.2) !important; color: var(--black) !important; }
@@ -36,7 +36,7 @@ export default function Hero({ nBar }: { nBar: number }) {
         Quanto costa un espresso<br />nel tuo <em style={{ fontStyle: 'italic', color: 'var(--caramel)' }}>quartiere?</em>
       </h1>
 
-      <p style={{ fontSize: '16px', color: 'var(--muted)', maxWidth: '480px', marginBottom: '2rem', lineHeight: 1.65 }}>
+      <p style={{ fontSize: '16px', color: 'var(--muted)', maxWidth: 'min(480px, 100%)', marginBottom: '2rem', lineHeight: 1.65 }}>
         Mappiamo i prezzi di espresso e cappuccino in tutta Italia, partendo da Milano. Nessuna legge, nessuna multa, solo trasparenza.
       </p>
 

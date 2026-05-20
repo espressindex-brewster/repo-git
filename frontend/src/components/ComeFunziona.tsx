@@ -15,7 +15,7 @@ const FAQ = [
 
 export default function ComeFunziona() {
   return (
-    <section id="come-funziona" style={{ padding: '4rem 2rem', borderBottom: '1px solid var(--border)', maxWidth: '680px' }}>
+    <section id="come-funziona" style={{ padding: 'clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem)', borderBottom: '1px solid var(--border)', maxWidth: '680px' }}>
       <h2 style={{
         fontFamily: 'var(--font-serif)',
         fontSize: 'clamp(24px, 3vw, 36px)',

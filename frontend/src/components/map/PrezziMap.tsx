@@ -88,6 +88,7 @@ export default function PrezziMap({ bars }: { bars: BarPin[] }) {
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [submitBar, setSubmitBar] = useState<{ id: string; nome: string } | null>(null)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   useEffect(() => {
     ;(window as any).__espressindexSubmit = (id: string, nome: string) => setSubmitBar({ id, nome })
@@ -251,66 +252,102 @@ export default function PrezziMap({ bars }: { bars: BarPin[] }) {
     mapRef.current?.flyTo({ center: [bar.lng, bar.lat], zoom: 15, duration: 800 })
   }
 
+  const sidebarContent = (
+    <>
+      <div className="px-3 py-2 border-b flex items-center justify-between">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Prezzi espresso</p>
+        <button
+          onClick={() => setMobileSidebarOpen(false)}
+          className="md:hidden text-gray-400 hover:text-gray-600 text-lg leading-none"
+          aria-label="Chiudi"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Legenda */}
+      <div className="px-3 py-2 border-b space-y-1">
+        {[
+          { col: '#22c55e', label: '< €1.10' },
+          { col: '#eab308', label: '€1.10–1.30' },
+          { col: '#f97316', label: '€1.30–1.60' },
+          { col: '#ef4444', label: '> €1.60' },
+          { col: '#94a3b8', label: 'non rilevato' },
+        ].map(({ col, label }) => (
+          <div key={label} className="flex items-center gap-2 text-xs text-gray-600">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: col }} />
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* Lista bar con prezzi */}
+      <div className="flex-1 overflow-y-auto">
+        {conPrezzo.length === 0 ? (
+          <p className="px-3 py-4 text-xs text-gray-400">Nessun prezzo ancora raccolto.</p>
+        ) : (
+          conPrezzo.map((bar) => (
+            <button
+              key={bar.id}
+              onClick={() => { flyToBar(bar); setMobileSidebarOpen(false) }}
+              className={`w-full text-left px-3 py-2.5 border-b hover:bg-gray-50 transition-colors ${selectedId === bar.id ? 'bg-amber-50 border-l-2 border-l-amber-500' : ''}`}
+            >
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-xs font-medium text-gray-800 truncate">{bar.nome}</span>
+                <span
+                  className="text-xs font-bold shrink-0"
+                  style={{ color: prezzoColore(bar.espresso) }}
+                >
+                  {prezzoLabel(bar.espresso)}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 mt-0.5">
+                <span className="text-[10px] text-gray-400">{bar.cap ? `CAP ${bar.cap}` : bar.citta}</span>
+                <span className="text-[10px] text-gray-300">·</span>
+                <span className="text-[10px] text-gray-400">{fasciaLabel(bar.espresso)}</span>
+              </div>
+              {bar.cappuccino != null && (
+                <div className="text-[10px] text-gray-400 mt-0.5">cappuccino {prezzoLabel(bar.cappuccino)}</div>
+              )}
+            </button>
+          ))
+        )}
+      </div>
+    </>
+  )
+
   return (
-    <div className="flex h-full w-full overflow-hidden">
-      {/* ── Sidebar ────────────────────────────── */}
-      <aside className="w-64 shrink-0 bg-white border-r flex flex-col overflow-hidden">
-        <div className="px-3 py-2 border-b">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Prezzi espresso</p>
-        </div>
-
-        {/* Legenda */}
-        <div className="px-3 py-2 border-b space-y-1">
-          {[
-            { col: '#22c55e', label: '< €1.10' },
-            { col: '#eab308', label: '€1.10–1.30' },
-            { col: '#f97316', label: '€1.30–1.60' },
-            { col: '#ef4444', label: '> €1.60' },
-            { col: '#94a3b8', label: 'non rilevato' },
-          ].map(({ col, label }) => (
-            <div key={label} className="flex items-center gap-2 text-xs text-gray-600">
-              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: col }} />
-              {label}
-            </div>
-          ))}
-        </div>
-
-        {/* Lista bar con prezzi */}
-        <div className="flex-1 overflow-y-auto">
-          {conPrezzo.length === 0 ? (
-            <p className="px-3 py-4 text-xs text-gray-400">Nessun prezzo ancora raccolto.</p>
-          ) : (
-            conPrezzo.map((bar) => (
-              <button
-                key={bar.id}
-                onClick={() => flyToBar(bar)}
-                className={`w-full text-left px-3 py-2.5 border-b hover:bg-gray-50 transition-colors ${selectedId === bar.id ? 'bg-amber-50 border-l-2 border-l-amber-500' : ''}`}
-              >
-                <div className="flex items-center justify-between gap-1">
-                  <span className="text-xs font-medium text-gray-800 truncate">{bar.nome}</span>
-                  <span
-                    className="text-xs font-bold shrink-0"
-                    style={{ color: prezzoColore(bar.espresso) }}
-                  >
-                    {prezzoLabel(bar.espresso)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[10px] text-gray-400">{bar.cap ? `CAP ${bar.cap}` : bar.citta}</span>
-                  <span className="text-[10px] text-gray-300">·</span>
-                  <span className="text-[10px] text-gray-400">{fasciaLabel(bar.espresso)}</span>
-                </div>
-                {bar.cappuccino != null && (
-                  <div className="text-[10px] text-gray-400 mt-0.5">cappuccino {prezzoLabel(bar.cappuccino)}</div>
-                )}
-              </button>
-            ))
-          )}
-        </div>
+    <div className="relative flex h-full w-full overflow-hidden">
+      {/* ── Sidebar desktop ─────────────────────── */}
+      <aside className="hidden md:flex w-64 shrink-0 bg-white border-r flex-col overflow-hidden">
+        {sidebarContent}
       </aside>
+
+      {/* ── Sidebar mobile overlay ───────────────── */}
+      {mobileSidebarOpen && (
+        <div className="md:hidden absolute inset-0 z-20 flex">
+          <aside className="w-72 max-w-[85vw] bg-white border-r flex flex-col overflow-hidden shadow-xl">
+            {sidebarContent}
+          </aside>
+          <div
+            className="flex-1 bg-black/30"
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+        </div>
+      )}
 
       {/* ── Mappa ──────────────────────────────── */}
       <div ref={containerRef} className="flex-1 h-full" />
+
+      {/* ── Toggle button mobile ─────────────────── */}
+      {!mobileSidebarOpen && (
+        <button
+          onClick={() => setMobileSidebarOpen(true)}
+          className="md:hidden absolute bottom-4 left-4 z-10 flex items-center gap-2 bg-white rounded-full shadow-lg px-4 py-2 text-xs font-semibold text-gray-700 border border-gray-200"
+        >
+          ☕ Lista prezzi {conPrezzo.length > 0 && `(${conPrezzo.length})`}
+        </button>
+      )}
 
       {submitBar && (
         <SubmitPriceModal

@@ -15,7 +15,8 @@ export default function TableSection({ rows }: { rows: CapRow[] }) {
         prezzi per CAP
       </div>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '280px' }}>
         <thead>
           <tr>
             {['CAP', 'espresso', 'vs. media'].map((h, i) => (
@@ -53,6 +54,7 @@ export default function TableSection({ rows }: { rows: CapRow[] }) {
           })}
         </tbody>
       </table>
+      </div>
     </section>
   )
 }

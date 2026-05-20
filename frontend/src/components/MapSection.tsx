@@ -31,7 +31,7 @@ export default async function MapSection() {
         border: '1px solid var(--border)',
         borderRadius: '8px',
         overflow: 'hidden',
-        height: '480px',
+        height: 'min(480px, 70vh)',
         display: 'flex',
       }}>
         <PrezziMap bars={bars} />
