@@ -19,7 +19,11 @@ const DESCRIPTION = 'Scopri quanto costa un espresso o un cappuccino al bancone 
 
 export const metadata: Metadata = {
   title: 'Espressindex — Prezzi espresso e caffè in Italia per quartiere',
-  icons: { icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='32' font-size='32'>☕</text></svg>" },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+  },
   description: DESCRIPTION,
   metadataBase: new URL('https://espressindex.com'),
   alternates: {
