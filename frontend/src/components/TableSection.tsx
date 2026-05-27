@@ -8,15 +8,19 @@ export interface CapRow {
 export default function TableSection({ rows }: { rows: CapRow[] }) {
   return (
     <section id="dati" style={{ padding: '2rem', borderBottom: '1px solid var(--border)' }}>
-      <div style={{
-        fontSize: '12px', color: 'var(--muted)',
-        textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '1rem',
+      <h2 style={{
+        fontFamily: 'var(--font-serif)', fontSize: 'clamp(20px, 2.5vw, 28px)',
+        fontWeight: 400, color: 'var(--espresso)', marginBottom: '0.5rem', letterSpacing: '-0.2px',
       }}>
-        prezzi per CAP
-      </div>
+        Prezzi espresso per CAP
+      </h2>
+      <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+        Media dei prezzi rilevati per codice di avviamento postale, ordinati dal più caro al più economico.
+      </p>
 
       <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '280px' }}>
+        <caption style={{ display: 'none' }}>Prezzi medi dell&apos;espresso al bancone per CAP in area Milano</caption>
         <thead>
           <tr>
             {['CAP', 'espresso', 'vs. media'].map((h, i) => (

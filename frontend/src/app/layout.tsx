@@ -15,10 +15,10 @@ const dmSans = DM_Sans({
   variable: '--font-sans',
 })
 
-const DESCRIPTION = 'Scopri quanto costa un espresso o un cappuccino al bancone nei bar italiani. Mappa aggiornata dei prezzi del caffè in Italia: confronta per quartiere, CAP e città.'
+const DESCRIPTION = 'Mappa aggiornata dei prezzi di espresso e cappuccino al bancone nei bar italiani. Confronta per quartiere e CAP: scopri quanto costa il caffè nel tuo quartiere.'
 
 export const metadata: Metadata = {
-  title: 'Espressindex — Prezzi espresso e caffè in Italia per quartiere',
+  title: 'Espressindex — Prezzi del caffè in Italia per quartiere',
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
@@ -37,6 +37,7 @@ export const metadata: Metadata = {
     siteName: 'Espressindex',
     locale: 'it_IT',
     type: 'website',
+    images: [{ url: '/opengraph-image', alt: 'Mappa prezzi espresso e caffè in Italia per quartiere' }],
   },
   twitter: {
     card: 'summary_large_image',
